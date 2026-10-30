@@ -37,7 +37,7 @@ export const auditReasoning = createServerFn({ method: "POST" })
     const { text, count } = redact(data.text);
     const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { "Lovable-API-Key": process.env.LOVABLE_API_KEY!, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": process.env["LOVABLE_API_KEY"] ?? "", "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "openai/gpt-6-astra",
         stream: true,
