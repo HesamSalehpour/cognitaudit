@@ -35,23 +35,39 @@ export const auditReasoning = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { text, count } = redact(data.text);
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { Authorization: `Bearer ${process.env.LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": process.env.LOVABLE_API_KEY!, "X-Lovable-AIG-SDK": "fetch", "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: `Assignment context: ${data.context || "n/a"}\n\nSubmission:\n"""${text}"""` },
-        ],
+        model: "openai/gpt-6-astra",
+        stream: true,
+        store: false,
+        reasoning: { effort: "low" },
+        text: { format: { type: "json_object" } },
+        instructions: SYSTEM_PROMPT,
+        input: `Return JSON. Assignment context: ${data.context || "n/a"}\n\nSubmission:\n"""${text}"""`,
       }),
     });
     if (res.status === 429) throw new Error("Rate limited, please retry shortly.");
     if (res.status === 402) throw new Error("AI credits exhausted.");
-    if (!res.ok) throw new Error("AI service error");
-    const j = await res.json();
-    const raw = j.choices?.[0]?.message?.content ?? "{}";
+    if (!res.ok || !res.body) throw new Error("AI service error " + res.status);
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "", raw = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split("\n");
+      buf = lines.pop() ?? "";
+      for (const l of lines) {
+        if (!l.startsWith("data:")) continue;
+        try {
+          const ev = JSON.parse(l.slice(5));
+          if (ev.type === "response.output_text.delta") raw += ev.delta;
+        } catch { /* ignore */ }
+      }
+    }
     const parsed = JSON.parse(raw.replace(/^```json|```$/g, "").trim());
     return { ...parsed, redactions: count } as Audit;
   });
