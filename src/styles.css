@@ -19,6 +19,9 @@
  */
 
 @theme inline {
+  --font-display: "Instrument Serif", serif;
+  --font-sans: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -62,26 +65,26 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --radius: 0.25rem;
+  --background: oklch(0.97 0.012 85);
+  --foreground: oklch(0.2 0.02 60);
+  --card: oklch(0.99 0.008 85);
+  --card-foreground: oklch(0.2 0.02 60);
+  --popover: oklch(0.99 0.008 85);
+  --popover-foreground: oklch(0.2 0.02 60);
+  --primary: oklch(0.58 0.19 35);
+  --primary-foreground: oklch(0.98 0.01 85);
+  --secondary: oklch(0.92 0.02 85);
+  --secondary-foreground: oklch(0.2 0.02 60);
+  --muted: oklch(0.92 0.02 85);
+  --muted-foreground: oklch(0.48 0.02 60);
+  --accent: oklch(0.8 0.14 85);
+  --accent-foreground: oklch(0.2 0.02 60);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.2 0.02 60 / 15%);
+  --input: oklch(0.2 0.02 60 / 20%);
+  --ring: oklch(0.58 0.19 35);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -141,4 +144,14 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
   }
+}
+
+@layer components {
+  body { font-family: var(--font-sans); }
+  .grain { background-image: radial-gradient(circle at 85% 10%, color-mix(in oklab, var(--primary) 18%, transparent), transparent 40%), radial-gradient(circle at 0% 90%, color-mix(in oklab, var(--accent) 25%, transparent), transparent 40%); }
+  .panel { @apply rounded-lg border border-border bg-card p-6 shadow-[0_1px_0_var(--border),0_20px_40px_-30px_var(--foreground)]; }
+  .field { @apply w-full rounded-md border border-input bg-background px-3 py-2 outline-none focus:border-ring; }
+  .label { @apply font-mono text-[11px] uppercase tracking-widest text-muted-foreground; }
+  .btn-primary { @apply rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-40; }
+  .btn-ghost { @apply rounded-full border border-border px-5 py-2.5 text-sm hover:bg-secondary; }
 }
