@@ -30,7 +30,7 @@ export function redact(text: string) {
 }
 
 export const auditReasoning = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ text: z.string().min(80).max(12000), context: z.string().max(500).optional() }).parse(d),
   )
   .handler(async ({ data }) => {
